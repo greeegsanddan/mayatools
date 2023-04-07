@@ -1,0 +1,42 @@
+import maya.cmds as cmds
+import os
+import time
+
+# Set the path to your folder containing Maya files
+path = 'your_path'
+
+# Get a list of all Maya files in the folder
+files = [f for f in os.listdir(path) if f.endswith(".ma") or f.endswith(".mb")]
+
+# Create a progress window
+progress_window = cmds.window(title="Playblast Progress", widthHeight=(300, 100))
+cmds.columnLayout(adjustableColumn=True)
+cmds.text(label="Opening file...")
+cmds.showWindow(progress_window)
+
+# Loop through each file
+for i, file in enumerate(files):
+    # Open the file
+    cmds.file(os.path.join(path, file), open=True)
+
+    # Set the playback range to 150 frames
+    cmds.playbackOptions(minTime=1, maxTime=150)
+    
+    # Import camera file
+    cmds.file('camera_file_path', i=True)
+
+    # Set camera to "camera_playblast_group|camera_playblast"
+    cmds.lookThru("camera_playblast_group|camera_playblast")
+
+    # Playblast each frame and save it with the same name as the file
+    playblast_file_name = f"{file.split('.')[0]}_{file.split('.')[1]}.mov"
+    cmds.playblast(filename=os.path.join('playblast_save_destination', playblast_file_name), format="qt", forceOverwrite=True, quality=65, widthHeight=[1920, 1080], compression="H.264", viewer=False, showOrnaments=False, offScreen=True, sound=None, startTime=1, endTime=150, framePadding=4, percent=100, clearCache=True, sequenceTime=False, useTraxSounds=False, rawFrameNumbers=False)
+
+    # Save any changes and close the file
+    cmds.file(rename="playblast_working_file.mb")
+    cmds.file(save=True, force=True)
+
+    # Update progress window text to show latest file opened
+    cmds.text(label=f"Opened {file}...")
+
+print("Done!")
