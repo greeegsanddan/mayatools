@@ -21,7 +21,7 @@ for i, file in enumerate(files):
 
     # Set the playback range to 150 frames
     cmds.playbackOptions(minTime=1, maxTime=150)
-    
+
     # Import camera file
     cmds.file('camera_file_path', i=True)
 
@@ -38,5 +38,8 @@ for i, file in enumerate(files):
 
     # Update progress window text to show latest file opened
     cmds.text(label=f"Opened {file}...")
+
+    # Update progress window text to show how many files have been opened and how many are left
+    cmds.text(label=f"Opened {i+1} of {len(files)} files...")
 
 print("Done!")
